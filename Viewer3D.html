@@ -1,0 +1,578 @@
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+
+<style>
+
+body {
+  background : rgba(0,0,0,.5);
+}
+#play_control {
+  position: -webkit-sticky;
+  position: sticky;
+  top: 0;
+  width: 100%;
+  border-radius: 25px;
+  margin: 10px;
+  background-color: rgb(48, 73, 110);
+}
+
+  #slider-range .ui-slider-range {
+    background-color: rgba(0, 0, 0, 0.384);
+  }
+
+  #slider-range .ui-state-default {
+    background: none;
+  }
+
+.click_pointer{
+  cursor: pointer;
+  margin: auto;
+}
+</style>
+
+<h1>3D Viewer</h1>
+
+<h4 id="stt_lbl">Status</h4>
+
+    <div id="play_control" class="row">
+      <div class="col-lg-2 col-md-2 col-sm-2 text-center">
+
+      </div>
+      <div class="col-lg-8 col-md-8 col-sm-8 text-center">
+
+
+        <div class="row p-2 pr-3">
+          <div class="col-1 click_pointer" onclick="pre_frame()"><i class="fa fa-backward" aria-hidden="true"></i>
+          </div>
+          <div class="col-8">
+            <div id="slider-range" style=" height: 40px; margin-top: 15px;">
+              <input type="range" class="form-range slider" value="1" min="1" id="slider" >
+            </div>
+          </div>
+          <div class="col-1 click_pointer" onclick="next_frame()"><i class="fa fa-forward" aria-hidden="true"></i>
+          </div>
+          <div class="col-2 text-left click_pointer">
+            <label id="frame_index" for="slider" class="form-label" style=""></label>
+          <i onclick="play_btn(this)" class="fa fa-play fa-lg" value="start" ></i>
+          </div>
+
+        </div>
+
+
+
+      </div>
+
+
+
+
+    </div>
+
+
+
+<div id="container"></div>
+
+
+<script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three/build/three.module.js",
+      "three/addons/": "https://unpkg.com/three/examples/jsm/"
+    }
+  }
+</script>
+
+
+
+
+
+<script type="module">
+
+  import * as THREE from 'three';
+  import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+  //import Stats from './jsm/libs/stats.module.js';
+  var container, stats;
+
+  var camera, scene, renderer,controls;
+  var point_list = [];
+  var GRF_list = [];
+  var C3d_Points,play_flag=false , frame=0,numFrame;
+  var slider;
+  var div_coeff = 100;
+
+
+  init();
+  animate();
+
+
+
+  function init() {
+
+    slider = document.getElementById('slider');
+
+    container = document.getElementById( 'container' );
+
+    //
+
+    camera = new THREE.PerspectiveCamera( 27, window.innerWidth / window.innerHeight, 1, 4000 );
+    camera.position.set(0, 20, 100);
+
+    scene = new THREE.Scene();
+
+    //
+
+    renderer = new THREE.WebGLRenderer();
+    renderer.setPixelRatio( window.devicePixelRatio );
+    renderer.setSize( window.innerWidth, window.innerHeight );
+    renderer.outputEncoding = THREE.sRGBEncoding;
+
+    container.appendChild( renderer.domElement );
+
+
+    var light = new THREE.PointLight(0xffffff, 1);
+    camera.add(light);
+
+    controls = new OrbitControls( camera, renderer.domElement );
+    controls.addEventListener( 'change', render ); // use only if there is no animation loop
+
+
+
+    //Ground
+    const size = 100;
+    const divisions = 10;
+    const gridHelper = new THREE.GridHelper(size, divisions);
+    scene.add(gridHelper);
+
+
+    window.addEventListener( 'resize', onWindowResize, false );
+
+  }
+
+  function onWindowResize() {
+
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+
+    renderer.setSize( window.innerWidth, window.innerHeight );
+
+  }
+
+  //
+
+  function animate() {
+
+    requestAnimationFrame( animate );
+
+    render();
+    //stats.update();
+
+  }
+
+  function render() {
+
+    if (play_flag) {
+
+        if (frame <= numFrame-2){
+          move_point(frame);
+          show_GRF(frame);
+          frame++;
+          slider.value = frame;
+        }
+        else{
+          frame = 0;
+          slider.value = 0;
+        }
+      }
+
+    renderer.render( scene, camera );
+
+  }
+
+window.load_data = load_data;
+function load_data(points,_numFrame){
+
+   document.getElementById('frame_index').innerText = _numFrame;
+
+    //load and initial
+   C3d_Points = points;
+   numFrame = _numFrame;
+   slider.min = 0;
+   slider.max = _numFrame;
+   slider.oninput = function () {
+    frame_index.innerHTML = this.value;
+    frame = this.value
+    move_point(this.value - 1)
+    show_GRF(this.value - 1);
+
+  }
+
+
+
+}
+
+window.add_point2scene = add_point2scene;
+function add_point2scene(_lbl,points) {
+
+   for (let index = 0; index < _lbl.length; index++) {
+
+        var geometry3 = new THREE.SphereGeometry(0.1);
+        var material3 = new THREE.MeshBasicMaterial({ color: 0xffff00 });
+        var sphere = new THREE.Mesh(geometry3, material3);
+        sphere.name = _lbl[index];
+        sphere.position.x = C3d_Points[0][(index*3)+0] / div_coeff;
+        sphere.position.y = C3d_Points[0][(index*3)+1] / div_coeff;
+        sphere.position.z = C3d_Points[0][(index*3)+2] / div_coeff;
+        scene.add(sphere);
+
+         point_list.push({ marker: sphere, name: _lbl[index]});
+
+    }
+}
+
+
+window.add_Global_Frame = add_Global_Frame;
+function add_Global_Frame() {
+
+    let points = [];
+    //X
+    let material2 = new THREE.LineBasicMaterial({
+        color: 0xff0000
+    });
+
+    points.push(new THREE.Vector3(0, 0, 0));
+    points.push(new THREE.Vector3(2, 0, 0));
+
+    let geometry2 = new THREE.BufferGeometry().setFromPoints(points);
+    let line = new THREE.Line(geometry2, material2);
+    scene.add(line);
+
+    //Y
+    material2 = new THREE.LineBasicMaterial({
+        color: 0x00ff00
+    });
+
+
+    points[0] = new THREE.Vector3(0, 0, 0);
+    points[1] = new THREE.Vector3(0, 2, 0);
+
+    geometry2 = new THREE.BufferGeometry().setFromPoints(points);
+    line = new THREE.Line(geometry2, material2);
+    scene.add(line);
+
+    //Z
+    material2 = new THREE.LineBasicMaterial({
+        color: 0x0000ff
+    });
+
+
+    points[0] = new THREE.Vector3(0, 0, 0);
+    points[1] = new THREE.Vector3(0, 0, 2);
+
+    geometry2 = new THREE.BufferGeometry().setFromPoints(points);
+    line = new THREE.Line(geometry2, material2);
+    scene.add(line);
+
+
+}
+
+
+function move_point(i){
+
+document.getElementById('frame_index').innerText = i;
+
+    for (let index = 0; index < point_list.length; index++) {
+        point_list[index].marker.position.x = C3d_Points[i][(index*3)+0] / div_coeff;;
+        point_list[index].marker.position.y = C3d_Points[i][(index*3)+1] / div_coeff;
+        point_list[index].marker.position.z = C3d_Points[i][(index*3)+2] / div_coeff;
+
+    }
+}
+
+
+window.Play = Play;
+function Play(flag){
+
+  play_flag = flag;
+}
+
+window.show_plate = show_plate;
+function show_plate(corners,num_plate,Y_SCREEN,COP,GRF,) {
+
+
+
+    for (let index = 0; index < corners.length; index++) {
+        corners[index] /= div_coeff;
+
+    }
+
+    let n_plate = corners.length / 12;
+
+    log(corners.length)
+
+    for (let index = 0; index < n_plate; index++) {
+
+        let c1 = [corners[(index * 12)], corners[(index * 12) + 1], corners[(index * 12) + 2]];
+        let c2 = [corners[(index * 12) + 3], corners[(index * 12) + 4], corners[(index * 12) + 5]];
+        let c3 = [corners[(index * 12) + 6], corners[(index * 12) + 7], corners[(index * 12) + 8]];
+        let c4 = [corners[(index * 12) + 9], corners[(index * 12) + 10], corners[(index * 12) + 11]];
+
+
+        const material2 = new THREE.LineBasicMaterial({
+            color: 0xff0000
+        });
+
+        //local coordination
+        let p_1_2 = [(c1[0] + c2[0]) / 2, (c1[1] + c2[1]) / 2, (c1[2] + c2[2]) / 2];
+        let p_1_4 = [(c1[0] + c4[0]) / 2, (c1[1] + c4[1]) / 2, (c1[2] + c4[2]) / 2];
+
+        let Surface_Orgin = [(c1[0] + c2[0] + c3[0] + c4[0]) / 4,
+        (c1[1] + c2[1] + c3[1] + c4[1]) / 4,
+        (c1[2] + c2[2] + c3[2] + c4[2]) / 4];
+
+        const points = [];
+
+        if (Y_SCREEN == '+Z') {
+            points.push(new THREE.Vector3(c1[0], c1[2], -1 * c1[1]));
+            points.push(new THREE.Vector3(c2[0], c2[2], -1 * c2[1]));
+            points.push(new THREE.Vector3(c3[0], c3[2], -1 * c3[1]));
+            points.push(new THREE.Vector3(c4[0], c4[2], -1 * c4[1]));
+            points.push(new THREE.Vector3(c1[0], c1[2], -1 * c1[1]));
+
+            add_Local_Frame([Surface_Orgin[0], Surface_Orgin[2], -1 * Surface_Orgin[1]],
+                [p_1_2[0], p_1_2[2], -1 * p_1_2[1]],
+                [p_1_4[0], p_1_4[2], -1 * p_1_4[1]],
+                [Surface_Orgin[0], Surface_Orgin[2] - 2, -1 * Surface_Orgin[1]]);
+        }
+        else if (Y_SCREEN == '+Y') {
+            points.push(new THREE.Vector3(c1[0], c1[1], c1[2]));
+            points.push(new THREE.Vector3(c2[0], c2[1], c2[2]));
+            points.push(new THREE.Vector3(c3[0], c3[1], c3[2]));
+            points.push(new THREE.Vector3(c4[0], c4[1], c4[2]));
+            points.push(new THREE.Vector3(c1[0], c1[1], c1[2]));
+
+            add_Local_Frame([Surface_Orgin[0], Surface_Orgin[1], Surface_Orgin[2]],
+                [p_1_2[0], p_1_2[1], p_1_2[2]],
+                [p_1_4[0], p_1_4[1], p_1_4[2]],
+                [Surface_Orgin[0], Surface_Orgin[1] - 2, Surface_Orgin[2]]);
+
+        } else if (Y_SCREEN == '-Z') {
+            points.push(new THREE.Vector3(c1[0], -1 * c1[2], -1 * c1[1]));
+            points.push(new THREE.Vector3(c2[0], -1 * c2[2], -1 * c2[1]));
+            points.push(new THREE.Vector3(c3[0], -1 * c3[2], -1 * c3[1]));
+            points.push(new THREE.Vector3(c4[0], -1 * c4[2], -1 * c4[1]));
+            points.push(new THREE.Vector3(c1[0], -1 * c1[2], -1 * c1[1]));
+
+
+
+            add_Local_Frame([Surface_Orgin[0], Surface_Orgin[2], -1 * Surface_Orgin[1]],
+                [p_1_2[0], p_1_2[2], -1 * p_1_2[1]],
+                [p_1_4[0], p_1_4[2], -1 * p_1_4[1]],
+                [Surface_Orgin[0], Surface_Orgin[2] - 2, -1 * Surface_Orgin[1]]);
+
+        }
+
+        const geometry2 = new THREE.BufferGeometry().setFromPoints(points);
+
+        const line = new THREE.Line(geometry2, material2);
+        scene.add(line);
+    }
+
+    // Add GRF
+    add_GRF2scene(num_plate, COP,GRF,Y_SCREEN)
+
+
+}
+
+function add_GRF2scene(n_Force_Plate,COP,GRF_VECTOR,Y_SCREEN) {
+
+    for (let j = 0; j < n_Force_Plate; j++) {
+
+        const material2 = new THREE.LineBasicMaterial({
+            color: 0xFF9402
+        });
+
+        try {
+
+
+            let _grf_temp = []
+            for (let index = j; index < COP.length - n_Force_Plate; index = index+n_Force_Plate) {
+
+                let points = [];
+
+                let p1 = [COP[index][0] / div_coeff, 0, COP[index][1] / (-1 * div_coeff)];
+                let p2 = [GRF_VECTOR[index][0]/ 100, GRF_VECTOR[index][2]/ 100, GRF_VECTOR[index][1]/ (-100)]
+
+                points.push(new THREE.Vector3(p1[0], p1[1], p1[2]));
+                points.push(new THREE.Vector3(p2[0], p2[1], p2[2]));
+
+
+
+                // if (Y_SCREEN == '+Z') {
+
+                // }
+                // else if (Y_SCREEN == '+Y') {
+
+                // }
+                // else if (Y_SCREEN == '-Z') {
+
+                // }
+
+                if (isNaN(points[0].x) || isNaN(points[0].y) || isNaN(points[0].z) || isNaN(points[1].x) || isNaN(points[1].y) || isNaN(points[1].z)) {
+                    points[0] = new THREE.Vector3(0, 0, 0);
+                    points[1] = new THREE.Vector3(0, 0, 0);
+                }
+
+                const geometry2 = new THREE.BufferGeometry().setFromPoints(points);
+                const line = new THREE.Line(geometry2, material2);
+                line.visible = false;
+                scene.add(line);
+
+                _grf_temp.push(line);
+
+
+            }
+
+            GRF_list.push(_grf_temp);
+
+        } catch (error) {
+
+            //::TODO
+           //var caller_line = error.stack.split("\n")[4];
+           //document.getElementById('stt_lbl').innerText += error.message + ' -- '+ error.stack;
+
+            log(error.message);
+        }
+
+    }
+
+
+}
+
+function show_GRF(frame) {
+
+    for (let index = 0; index < GRF_list.length; index++) {
+
+        for (let f = 0; f < GRF_list[index].length; f++) {
+
+            GRF_list[index][f].visible = false;
+        }
+    }
+
+
+        for (let index = 0; index < GRF_list.length; index++) {
+            GRF_list[index][frame].visible = true;
+        }
+}
+
+
+function add_Local_Frame(origin, y, x, z) {
+
+    let points = [];
+
+    //X
+    let material2 = new THREE.LineBasicMaterial({
+        color: 0xff0000
+    });
+
+
+    points.push(new THREE.Vector3(origin[0], origin[1], origin[2]));
+    points.push(new THREE.Vector3(x[0], x[1], x[2]));
+
+    let geometry2 = new THREE.BufferGeometry().setFromPoints(points);
+    let line = new THREE.Line(geometry2, material2);
+    scene.add(line);
+
+    //Y
+    material2 = new THREE.LineBasicMaterial({
+        color: 0x00ff00
+    });
+
+
+    points[0] = new THREE.Vector3(origin[0], origin[1], origin[2]);
+    points[1] = new THREE.Vector3(y[0], y[1], y[2]);
+
+    geometry2 = new THREE.BufferGeometry().setFromPoints(points);
+    line = new THREE.Line(geometry2, material2);
+    scene.add(line);
+
+    //Z
+    material2 = new THREE.LineBasicMaterial({
+        color: 0x0000ff
+    });
+
+
+    points[0] = new THREE.Vector3(origin[0], origin[1], origin[2]);
+    points[1] = new THREE.Vector3(z[0], z[1], z[2]);
+
+    geometry2 = new THREE.BufferGeometry().setFromPoints(points);
+    line = new THREE.Line(geometry2, material2);
+    scene.add(line);
+
+}
+
+
+
+
+
+
+
+function log(msg){
+    document.getElementById('stt_lbl').innerText += msg + '\n';
+}
+</script>
+
+<script >
+async function loaddata(){
+
+  invoke = google.colab.kernel.invokeFunction
+  result = await invoke('notebook.getPoint', [], {})  // *args, **kw
+   var main = (result.data['application/json'])
+   var p = main.Points
+   var lbl = main.Label
+   var Y_SCREEN = main.Y_SCREEN
+   var NumFrames = main.NumFrames
+   var corners = main.ForcePlateCorners
+   var nForceplate = main.NumForceplate
+   var COP = main.COP
+   var V_GRF = main.GRF
+
+
+
+
+   document.getElementById('frame_index').innerText = '_numFrame';
+
+
+    load_data(p,NumFrames)
+    add_point2scene(lbl,p)
+    add_Global_Frame();
+    show_plate(corners,nForceplate,Y_SCREEN,COP,V_GRF);
+
+
+}
+loaddata();
+
+
+function play_btn(btn){
+  if (btn.value=="start" || btn.value === undefined){
+    log('Start')
+    btn.value = "stop";
+    btn.className = "fa fa-stop fa-lg"
+    Play(true);
+  }
+  else{
+    log('Stop')
+    btn.value = "start";
+    btn.className = "fa fa-play fa-lg"
+    Play(false);
+  }
+
+}
+
+
+function log(msg){
+    document.getElementById('stt_lbl').innerText = msg + '\n';
+}
+
+</script>
+
+
