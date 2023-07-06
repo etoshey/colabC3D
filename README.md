@@ -1,6 +1,6 @@
 🌟 Welcome to ColabC3D! 🌟
 
-ColabC3D is an interactive and user-friendly collab notebook designed to enhance your experience with C3D data manipulation and visualization. Whether you're working with Motion capture data, Forceplate data, Analog data like EMG or ECG, and more, ColabC3D has got you covered.
+ColabC3D is an interactive and user-friendly Colab notebook designed to enhance your experience with C3D data manipulation and visualization. Whether you're working with Motion capture data, Forceplate data, Analog data like EMG or ECG, and more, ColabC3D has got you covered.
 
 Powered by the cloud-based Python development environment of Google Colab, our platform offers a seamless and efficient solution for processing and visualizing C3D files. We've integrated the cutting-edge capabilities of C3DTools, Three.js, and Pygwalker to provide researchers, practitioners, and enthusiasts from various domains with a flexible and powerful toolset.
 
