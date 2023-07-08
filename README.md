@@ -9,7 +9,7 @@ Our readme provides a straightforward setup process, guiding you through the ins
 ✨ We're here to help! If you encounter any issues or have any questions, please don't hesitate to create an issue or reach out to us at [Soroosh.b.k@gmail.com](mailto:soroosh.b.k@gmail.com). Your feedback is invaluable to us. ✨
 
 
-![alt text](https://github.com/etoshey/colabC3D/blob/1c53d69e4022abdb0251d2a06729e2334a1edfe1/image%20(2).png)
+![alt text](https://github.com/etoshey/colabC3D/blob/1c53d69e4022abdb0251d2a06729e2334a1edfe1/diagram.png)
 
 
 ## Usage:
@@ -21,5 +21,5 @@ Open the [ColabC3D](https://colab.research.google.com/github/etoshey/colabC3D/bl
 5. Step5: Convert to ASCII,TRC and MOT
 ## 
 
-![alt text](https://github.com/etoshey/colabC3D/blob/90b12c2d255e0674e214937dde667dd91b44837e/Files/3DView.PNG)
+![alt text](https://github.com/etoshey/colabC3D/blob/90b12c2d255e0674e214937dde667dd91b44837e/colabc3d.gif)
 
