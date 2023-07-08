@@ -21,5 +21,5 @@ Open the [ColabC3D](https://colab.research.google.com/github/etoshey/colabC3D/bl
 5. Step5: Convert to ASCII,TRC and MOT
 ## 
 
-![alt text](https://github.com/etoshey/colabC3D/blob/90b12c2d255e0674e214937dde667dd91b44837e/colabc3d.gif)
+![alt text](https://github.com/etoshey/colabC3D/blob/ef5b173e4da7a8ac9811a0f5567a0e557a0ab662/colabc3d.gif)
 
