@@ -9,7 +9,7 @@ Our readme provides a straightforward setup process, guiding you through the ins
 ✨ We're here to help! If you encounter any issues or have any questions, please don't hesitate to create an issue or reach out to us at [Soroosh.b.k@gmail.com](mailto:soroosh.b.k@gmail.com). Your feedback is invaluable to us. ✨
 
 
-![alt text](https://github.com/etoshey/colabC3D/blob/1c53d69e4022abdb0251d2a06729e2334a1edfe1/diagram.png)
+![alt text](https://github.com/etoshey/colabC3D/blob/fad9431e715051003ddc0b9e39a9b8a330e6f527/diagram.png)
 
 
 ## Usage:
