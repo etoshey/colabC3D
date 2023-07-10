@@ -1,3 +1,6 @@
+![alt text](https://github.com/etoshey/colabC3D/blob/37c608ba7632685113cc96d416b9182b91545228/Files/banner2.png)
+
+
 🌟 Welcome to ColabC3D! 🌟
 
 ColabC3D is an interactive and user-friendly Colab notebook designed to enhance your experience with C3D data manipulation and visualization. Whether you're working with Motion capture data, Forceplate data, Analog data like EMG or ECG, and more, ColabC3D has got you covered.
