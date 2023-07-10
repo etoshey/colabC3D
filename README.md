@@ -28,3 +28,6 @@ Open the [ColabC3D](https://colab.research.google.com/github/etoshey/colabC3D/bl
 
 ![alt text](https://github.com/etoshey/colabC3D/blob/ef5b173e4da7a8ac9811a0f5567a0e557a0ab662/colabc3d.gif)
 
+
+## Tutorial
+[Watch the video](https://youtu.be/m5JPyGvXBdw)
