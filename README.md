@@ -31,3 +31,14 @@ Open the [ColabC3D](https://colab.research.google.com/github/etoshey/colabC3D/bl
 
 ## Tutorial
 [Watch the video](https://youtu.be/m5JPyGvXBdw)
+
+## Cite
+Please cite the following:
+```
+@article{mokhtarzadehstreamlining,
+  title={Streamlining C3D File Processing and Visualization: A User-Friendly Approach Using Google Colab and Open-Source Python Packages},
+  author={Mokhtarzadeh, Hossein and Bagheri, Soroosh},
+  publisher={Engineering Archive}
+}
+```
+```
